@@ -1,0 +1,8 @@
+# frost-clip-dl — dépendances
+# twitch-dl épinglé en 3.3.1 : le script importe des modules internes
+# (twitchdl.http, twitchdl.commands.download...) qui peuvent bouger entre versions.
+twitch-dl==3.3.1
+
+# Imports directs du script
+click>=8.0.0,<9.0.0
+PyYAML>=6.0

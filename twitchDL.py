@@ -1,27 +1,35 @@
+import os
 import re
 import sys
-import os
-from os import path
-import click
 from datetime import datetime
+from os import path
+from typing import Callable, Generator, Optional
+
+import click
+import yaml
 from twitchdl import twitch, utils
 from twitchdl.commands.download import get_clip_authenticated_url
-from twitchdl.download import download_file
-from twitchdl.output import green, print_clip, print_clip_compact, print_json, print_paged, yellow
-import yaml
-from typing import Callable, Generator, Optional
+from twitchdl.http import download_file
+from twitchdl.output import (
+    green,
+    print_clip,
+    print_clip_compact,
+    print_json,
+    print_paged,
+    yellow,
+)
 from twitchdl.twitch import Clip, ClipsPeriod
 
 
 def _download_clips(generator: Generator[Clip, None, None], streamerName):
     for clip in generator:
         target = _target_filename(clip)
-        today = datetime.today().strftime('%Y-%m-%d')
+        today = datetime.today().strftime("%Y-%m-%d")
         directoryPath = "clips/" + streamerName + "/" + today
         print(directoryPath)
         if not path.exists(directoryPath):
             os.makedirs(directoryPath)
-        
+
         directoryPath = directoryPath + "/" + target
         if path.exists(directoryPath):
             click.echo(f"Already downloaded: {green(directoryPath)}")
@@ -29,6 +37,7 @@ def _download_clips(generator: Generator[Clip, None, None], streamerName):
             url = get_clip_authenticated_url(clip["slug"], "source")
             click.echo(f"Downloading: {yellow(directoryPath)}")
             download_file(url, directoryPath)
+
 
 def _target_filename(clip: Clip):
     url = clip["videoQualities"][0]["sourceURL"]
@@ -50,6 +59,7 @@ def _target_filename(clip: Clip):
     )
 
     return f"{name}.{ext}"
+
 
 with open("streamers.yaml") as stream:
     try:
