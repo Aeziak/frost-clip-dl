@@ -21,6 +21,34 @@ from twitchdl.output import (
 from twitchdl.twitch import Clip, ClipsPeriod
 
 
+def _get_clip_access_token_patched(slug: str):
+    query = f"""
+    {{
+        clip(slug: "{slug}") {{
+            id
+            playbackAccessToken(params: {{
+                platform: "web",
+                playerBackend: "mediaplayer",
+                playerType: "site"
+            }}) {{
+                signature
+                value
+            }}
+            videoQualities {{
+                frameRate
+                quality
+                sourceURL
+            }}
+        }}
+    }}
+    """
+    response = twitch.gql_query(query.strip())
+    return response["data"]["clip"]
+
+
+twitch.get_clip_access_token = _get_clip_access_token_patched
+
+
 def _download_clips(generator: Generator[Clip, None, None], streamerName):
     for clip in generator:
         target = _target_filename(clip)
